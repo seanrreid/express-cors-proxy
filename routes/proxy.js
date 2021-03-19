@@ -4,8 +4,19 @@ const express = require('express'),
 
 router.get('/', async (req, res) => {
     const { url } = req.query;
+    let urlToProxy = url;
+    if (Object.entries(req.query).length > 1) {
+        const queryParams = Object.entries(req.query);
+        let queryString = url;
+        for (const [key, value] of queryParams) {
+            if (key != 'url') {
+                queryString += `&${key}=${value}`;
+            }
+        }
+        urlToProxy = encodeURI(queryString);
+    }
     try {
-        const response = await fetch(url).then((response) => response.json());
+        const response = await fetch(urlToProxy).then((response) => response.json());
         res.header('Access-Control-Allow-Origin', '*');
         res.header(
             'Access-Control-Allow-Headers',
